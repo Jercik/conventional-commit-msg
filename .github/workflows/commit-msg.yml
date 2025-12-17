@@ -19,11 +19,14 @@ jobs:
 
       - name: Validate commits with commitlint
         shell: bash
+        # Run from /tmp to avoid npx resolving to the local package.json.
+        # Since this repo IS conventional-commit-msg, npx would try to run
+        # the local (unbuilt) package instead of downloading from npm.
         run: |
           set -euo pipefail
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            npx -y conventional-commit-msg --verbose --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}"
+            (cd /tmp && npx -y conventional-commit-msg --verbose --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}")
           else
-            npx -y conventional-commit-msg --verbose --last
+            (cd /tmp && npx -y conventional-commit-msg --verbose --last)
           fi
