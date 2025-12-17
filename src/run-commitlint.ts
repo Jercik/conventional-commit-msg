@@ -1,8 +1,17 @@
+import { fileURLToPath } from "node:url";
+
 import format from "@commitlint/format";
 import lint from "@commitlint/lint";
 import load from "@commitlint/load";
 import read from "@commitlint/read";
 import type { LintOptions, LintOutcome } from "@commitlint/types";
+
+// Resolve config path absolutely to work regardless of cwd.
+// This is necessary because @commitlint/load resolves extends relative to cwd,
+// but when running via npx from a different directory, the config won't be found.
+const configConventionalPath = fileURLToPath(
+  import.meta.resolve("@commitlint/config-conventional"),
+);
 
 interface CommitlintOptions {
   edit?: string | undefined;
@@ -27,7 +36,7 @@ interface LintReport {
 export async function runCommitlint(
   options: CommitlintOptions,
 ): Promise<number> {
-  const loaded = await load({ extends: ["@commitlint/config-conventional"] });
+  const loaded = await load({ extends: [configConventionalPath] });
 
   // Use stdin message if provided, otherwise read from other sources
   let filteredMessages: string[];
