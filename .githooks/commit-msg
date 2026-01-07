@@ -1,13 +1,2 @@
 #!/usr/bin/env bash
-# Native Git hook - enable with: git config core.hooksPath .githooks
-# Requires: pnpm build (run after code changes)
-set -euo pipefail
-
-repo_root="$(git rev-parse --show-toplevel)"
-
-if [[ ! -f "$repo_root/dist/cli.js" ]]; then
-  echo "Error: dist/cli.js not found. Run 'pnpm build' first." >&2
-  exit 1
-fi
-
-node "$repo_root/bin/conventional-commit-msg" --verbose "$@"
+npx -y conventional-commit-msg "$1"

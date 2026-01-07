@@ -42,26 +42,26 @@
   },
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
-    "@commitlint/config-conventional": "^20",
-    "@commitlint/format": "^20",
-    "@commitlint/lint": "^20",
-    "@commitlint/load": "^20",
-    "@commitlint/read": "^20",
-    "@commitlint/types": "^20",
+    "@commitlint/config-conventional": "^20.3.0",
+    "@commitlint/format": "^20.2.0",
+    "@commitlint/lint": "^20.3.0",
+    "@commitlint/load": "^20.3.0",
+    "@commitlint/read": "^20.2.0",
+    "@commitlint/types": "^20.2.0",
     "commander": "^14.0.2"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^24.10.4",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@types/node": "^25.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.39.2",
     "eslint-config-axpoint": "^1.0.0",
-    "fta-check": "^1.5.0",
+    "fta-check": "^1.5.1",
     "fta-cli": "^3.0.0",
-    "knip": "^5.74.0",
+    "knip": "^5.80.0",
     "prettier": "3.7.4",
     "semantic-release": "^25.0.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.16"
   }
 }

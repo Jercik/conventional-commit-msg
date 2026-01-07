@@ -13,22 +13,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
       - name: Validate commits with commitlint
+        shell: bash
         run: |
+          set -euo pipefail
+
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            node bin/conventional-commit-msg --verbose --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}"
+            npx -y conventional-commit-msg --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}"
           else
-            node bin/conventional-commit-msg --verbose --last
+            npx -y conventional-commit-msg --last
           fi
