@@ -5,7 +5,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
-
+    "declarationMap": true,
+    "sourceMap": true,
+    "rewriteRelativeImportExtensions": true,
+    "types": ["node"],
     /* Not running in the DOM */
     "lib": ["es2022"]
   },
