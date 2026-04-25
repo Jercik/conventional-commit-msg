@@ -50,15 +50,10 @@ Examples:
   .action(async (file, options) => {
     const hasPipedInput = !process.stdin.isTTY;
     const hasValidationTarget =
-      file !== undefined ||
-      options.last === true ||
-      options.from !== undefined ||
-      hasPipedInput;
+      file !== undefined || options.last === true || options.from !== undefined || hasPipedInput;
 
     if (!hasValidationTarget) {
-      program.error(
-        "Missing validation target. Provide a file, --last, --from, or pipe input.",
-      );
+      program.error("Missing validation target. Provide a file, --last, --from, or pipe input.");
     }
 
     // Read from stdin if piped and no other input source

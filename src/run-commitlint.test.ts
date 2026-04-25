@@ -2,6 +2,8 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { runCommitlint } from "./run-commitlint.js";
 
 describe("runCommitlint", () => {
@@ -34,7 +36,6 @@ describe("runCommitlint", () => {
   });
 
   it("validates using --last flag", async () => {
-    // This test validates the last commit in this repo (which should be valid)
     const exitCode = await runCommitlint({ last: true });
 
     expect(exitCode).toBe(0);
