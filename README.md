@@ -10,8 +10,13 @@ Validates commit messages against the [Conventional Commits](https://www.convent
 
 ```bash
 #!/bin/sh
-npx -y conventional-commit-msg "$1"
+npm exec --yes --package=conventional-commit-msg@latest -- conventional-commit-msg "$1"
 ```
+
+`npm exec --package=…@latest` (not `npx -y`) keeps the hook working when an
+`npm_config_package` env var is inherited (some tool wrappers set it) and when
+the hook runs inside this package's own repository, where the local package name
+would otherwise shadow the published binary.
 
 2. Make it executable and enable the hooks directory:
 
