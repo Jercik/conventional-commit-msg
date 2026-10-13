@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -36,8 +37,35 @@ describe("runCommitlint", () => {
   });
 
   it("validates using --last flag", async () => {
-    const exitCode = await runCommitlint({ last: true });
+    // The pre-commit hook runs tests in a snapshot repository whose only commit is not conventional, so build the repository this test reads.
+    const environment = Object.fromEntries(
+      Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
+    );
+    const git = (...args: string[]) =>
+      execFileSync(
+        "git",
+        [
+          "-c",
+          "commit.gpgsign=false",
+          "-c",
+          "user.name=Test",
+          "-c",
+          "user.email=test@example.com",
+          ...args,
+        ],
+        { cwd: temporaryDirectory, env: environment, stdio: "ignore" },
+      );
+    git("init");
+    git("commit", "--allow-empty", "-m", "feat: add new feature");
 
-    expect(exitCode).toBe(0);
+    const originalDirectory = process.cwd();
+    process.chdir(temporaryDirectory);
+    try {
+      const exitCode = await runCommitlint({ last: true });
+
+      expect(exitCode).toBe(0);
+    } finally {
+      process.chdir(originalDirectory);
+    }
   });
 });
