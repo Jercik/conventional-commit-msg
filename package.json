@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.app.json",
+    "check:dts": "node scripts/check-dts.ts",
     "clean": "rm -rf dist *.tsbuildinfo",
     "format": "oxfmt --config .oxfmtrc.json .",
     "format:check": "oxfmt --check --config .oxfmtrc.json .",
@@ -31,7 +32,7 @@
     "knip": "knip",
     "lint": "oxlint --deny-warnings --report-unused-disable-directives .",
     "prepack": "pnpm run rebuild",
-    "prepare": "if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then git config core.hooksPath .githooks; fi",
+    "prepare": "if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then hooks_path=$(git config --local --get-all core.hooksPath 2>/dev/null && echo .) && [ \"$hooks_path\" = \"$(echo .githooks; echo .)\" ] || git config core.hooksPath .githooks; fi",
     "rebuild": "pnpm run clean && pnpm run build",
     "start": "pnpm -s run rebuild && node bin/conventional-commit-msg",
     "test": "vitest run",
@@ -68,5 +69,8 @@
   "engines": {
     "node": ">=24.15.0"
   },
-  "packageManager": "pnpm@11.22.0"
+  "packageManager": "pnpm@12.11.2",
+  "j4k": {
+    "alignDtsCheck": true
+  }
 }
