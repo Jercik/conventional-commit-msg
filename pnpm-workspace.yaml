@@ -8,3 +8,7 @@ registries:
 minimumReleaseAgeIgnoreMissingTime: false
 minimumReleaseAgeExclude:
   - "@j4k/*"
+packageExtensions:
+  semantic-release:
+    dependencies:
+      "@types/signale": ^1.4.7
