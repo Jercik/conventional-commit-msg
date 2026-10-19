@@ -2,8 +2,7 @@
 # Native Git hook - enable with: git config core.hooksPath .githooks
 set -euo pipefail
 
-# This repository publishes the bin, and pnpm never links a package into its own node_modules/.bin, so run the exact released version instead.
-npm exec --yes --package=conventional-commit-msg@1.0.8 -- conventional-commit-msg "$1"
+bash scripts/check-msg.sh < "$1"
 
 ignored_staged_paths=(
   ":(exclude).claude/**"
