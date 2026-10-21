@@ -193,9 +193,15 @@ importers:
         specifier: ^15.0.0
         version: 15.0.0
     devDependencies:
+      '@j4k-oss/fta-check':
+        specifier: ^1.5.10
+        version: 1.5.11(fta-cli@3.0.0)
       '@j4k/oxlint-config':
         specifier: ^2.14.2
         version: 2.14.2(oxlint-tsgolint@7.0.2004)(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))
+      '@j4k/semantic-release-forgejo':
+        specifier: ^1.2.3
+        version: 1.2.3(semantic-release@25.0.3(supports-color@7.2.0)(typescript@7.0.2))
       '@total-typescript/ts-reset':
         specifier: ^0.6.1
         version: 0.6.1
@@ -208,9 +214,6 @@ importers:
       conventional-changelog-conventionalcommits:
         specifier: ^9.3.1
         version: 9.3.1
-      fta-check:
-        specifier: ^1.5.8
-        version: 1.5.8(fta-cli@3.0.0)
       fta-cli:
         specifier: ^3.0.0
         version: 3.0.0
@@ -278,11 +281,6 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
-
-  '@commander-js/extra-typings@14.0.0':
-    resolution: {integrity: sha512-hIn0ncNaJRLkZrxBIp5AsW/eXEHNKYQBh0aPdoUqNgD+Io3NIykQqpKFyKcuasZhicGaEZJX/JBSIkZ4e5x8Dg==}
-    peerDependencies:
-      commander: ~14.0.0
 
   '@commander-js/extra-typings@15.0.0':
     resolution: {integrity: sha512-yeJlba62xqmkgELUsn7356MEnzLLu/fw2x4lofFqGnXh6YysRdEs2BaLeLtg1+KU0AXvMeqQvTTp+3hBEBK+EA==}
@@ -530,11 +528,22 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@j4k-oss/fta-check@1.5.11':
+    resolution: {integrity: sha512-7qA49XXvRhwVW0tmY0K6LBtNW+jpGOyc/JPIsn9HpBrY+NtLu2GcJiv5KhtjM1bAEf2w4QFQl6ayX1wupF02Lg==, tarball: https://code.j4k.dev/api/packages/j4k-oss/npm/%40j4k-oss%2Ffta-check/-/1.5.11/fta-check-1.5.11.tgz}
+    hasBin: true
+    peerDependencies:
+      fta-cli: ^3.0.0
+
   '@j4k/oxlint-config@2.14.2':
     resolution: {integrity: sha512-oZOjE8rzMTmneBRf615vDrOq8+zdw1wl3voHjiydXok9JIuV2QLCP2blBFs5RFBU4xyX4OoEIyZgIqIjqLeKwg==, tarball: https://code.j4k.dev/api/packages/j4k/npm/%40j4k%2Foxlint-config/-/2.14.2/oxlint-config-2.14.2.tgz}
     peerDependencies:
       oxlint: '>=1.86.0'
       oxlint-tsgolint: '>=7.0.2003'
+
+  '@j4k/semantic-release-forgejo@1.2.3':
+    resolution: {integrity: sha512-roboESXlkenqj3ry58dFW56/bIm6hC5g02UKAGnSgjsiXP3tEBVIvY7izyUFp7435WCpgLQbCpR9naX+cfwA0A==, tarball: https://code.j4k.dev/api/packages/j4k/npm/%40j4k%2Fsemantic-release-forgejo/-/1.2.3/semantic-release-forgejo-1.2.3.tgz}
+    peerDependencies:
+      semantic-release: ^25.0.3
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1610,10 +1619,6 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
-  commander@14.0.3:
-    resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
-    engines: {node: '>=20'}
-
   commander@15.0.0:
     resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
     engines: {node: '>=22.12.0'}
@@ -1826,13 +1831,6 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
-
-  fta-check@1.5.8:
-    resolution: {integrity: sha512-IQvXSNqjE4UAIyR27jrTpi5DgxkFHip9Weq+ZuONU3BFqTsTXysapIDISkcSoEloHAU8uoHU0lZMSRDB6Lx7hg==}
-    engines: {node: '>=24.15.0'}
-    hasBin: true
-    peerDependencies:
-      fta-cli: ^3.0.0
 
   fta-cli@3.0.0:
     resolution: {integrity: sha512-SBmoqIwbN7PLDmwmrPgjr6Z6/S9jPhNz5TCPmEVFkIaeloc/T2WXLeeXqhG1+C0UQxpOfGrC7CUb4friqbc2kQ==}
@@ -2936,10 +2934,6 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@commander-js/extra-typings@14.0.0(commander@14.0.3)':
-    dependencies:
-      commander: 14.0.3
-
   '@commander-js/extra-typings@15.0.0(commander@15.0.0)':
     dependencies:
       commander: 15.0.0
@@ -3140,10 +3134,20 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
+  '@j4k-oss/fta-check@1.5.11(fta-cli@3.0.0)':
+    dependencies:
+      '@commander-js/extra-typings': 15.0.0(commander@15.0.0)
+      commander: 15.0.0
+      fta-cli: 3.0.0
+
   '@j4k/oxlint-config@2.14.2(oxlint-tsgolint@7.0.2004)(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))':
     dependencies:
       oxlint: 1.88.0(oxlint-tsgolint@7.0.2004)
       oxlint-tsgolint: 7.0.2004
+
+  '@j4k/semantic-release-forgejo@1.2.3(semantic-release@25.0.3(supports-color@7.2.0)(typescript@7.0.2))':
+    dependencies:
+      semantic-release: 25.0.3(supports-color@7.2.0)(typescript@7.0.2)
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
@@ -3913,8 +3917,6 @@ snapshots:
 
   color-name@1.1.4: {}
 
-  commander@14.0.3: {}
-
   commander@15.0.0: {}
 
   compare-func@2.0.0:
@@ -4142,12 +4144,6 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
-
-  fta-check@1.5.8(fta-cli@3.0.0):
-    dependencies:
-      '@commander-js/extra-typings': 14.0.0(commander@14.0.3)
-      commander: 14.0.3
-      fta-cli: 3.0.0
 
   fta-cli@3.0.0: {}
 

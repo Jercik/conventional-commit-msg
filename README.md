@@ -1,8 +1,32 @@
 # conventional-commit-msg
 
+Source: https://code.j4k.dev/j4k-oss/conventional-commit-msg. github.com/Jercik/conventional-commit-msg is a read-only mirror; open issues and pull requests on the Forge.
+
 Zero-config commitlint frontend for conventional commits.
 
 Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) specification using [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional).
+
+## Installation
+
+Each release is published under two names with the same files:
+
+- `conventional-commit-msg` on npmjs.org, for `npx` and `npm exec`. All examples below use it.
+- `@j4k-oss/conventional-commit-msg` on the `code.j4k.dev` registry, for pnpm projects that exempt the `@j4k-oss` scope from `minimumReleaseAge`. The registry reads anonymously.
+
+To use the `code.j4k.dev` copy, map the scope to its registry and exempt it in `pnpm-workspace.yaml`, then add the package:
+
+```yaml
+registries:
+  "@j4k-oss": https://code.j4k.dev/api/packages/j4k-oss/npm/
+minimumReleaseAgeExclude:
+  - "@j4k-oss/*"
+```
+
+```bash
+pnpm add -D @j4k-oss/conventional-commit-msg
+```
+
+Both packages install the same `conventional-commit-msg` command.
 
 ## Quick Start: Git Hook
 
