@@ -8,12 +8,31 @@ Validates commit messages against the [Conventional Commits](https://www.convent
 
 ## Installation
 
-Each release is published under two names with the same files:
+The package is published only as `@j4k-oss/conventional-commit-msg` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `conventional-commit-msg` on npmjs.org is frozen at its last version and gets no updates.
 
-- `conventional-commit-msg` on npmjs.org, for `npx` and `npm exec`. All examples below use it.
-- `@j4k-oss/conventional-commit-msg` on the `code.j4k.dev` registry, for pnpm projects that exempt the `@j4k-oss` scope from `minimumReleaseAge`. The registry reads anonymously.
+The `@j4k-oss` scope also exists on npmjs.org under an owner we have not confirmed, so a bare `@j4k-oss/...` command could fetch someone else's package. Map the scope to `code.j4k.dev` once in `~/.npmrc`:
 
-To use the `code.j4k.dev` copy, map the scope to its registry and exempt it in `pnpm-workspace.yaml`, then add the package:
+```ini
+@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/
+```
+
+The commands below also pass the registry as a flag, which is enough for a single `npx` run. Keep the `~/.npmrc` line for global installs: `npm update -g` and `npm outdated -g` read the registry from the configuration, and without the line they look the scoped name up on npmjs.org.
+
+If you installed the unscoped package globally, remove it first with `npm uninstall -g conventional-commit-msg`. Both packages provide the `conventional-commit-msg` command, and `npm install -g` stops with `EEXIST` while the old copy is there.
+
+Install the command globally:
+
+```bash
+npm install -g --@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/ @j4k-oss/conventional-commit-msg
+```
+
+Or run it once without installing:
+
+```bash
+npx -y --@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/ @j4k-oss/conventional-commit-msg@latest --last
+```
+
+In a pnpm project, map the scope and exempt it from `minimumReleaseAge` in `pnpm-workspace.yaml`, then add the package:
 
 ```yaml
 registries:
@@ -26,7 +45,7 @@ minimumReleaseAgeExclude:
 pnpm add -D @j4k-oss/conventional-commit-msg
 ```
 
-Both packages install the same `conventional-commit-msg` command.
+The package installs the `conventional-commit-msg` command, which the examples below run. After a pnpm project install, run it as `pnpm exec conventional-commit-msg`.
 
 ## Quick Start: Git Hook
 
@@ -34,13 +53,13 @@ Both packages install the same `conventional-commit-msg` command.
 
 ```bash
 #!/bin/sh
-npm exec --yes --package=conventional-commit-msg@latest -- conventional-commit-msg "$1"
+npm exec --yes --@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/ --package=@j4k-oss/conventional-commit-msg@latest -- conventional-commit-msg "$1"
 ```
 
 `npm exec --package=…@latest` (not `npx -y`) keeps the hook working when an
 `npm_config_package` env var is inherited (some tool wrappers set it) and when
 the hook runs inside this package's own repository, where the local package name
-would otherwise shadow the published binary.
+would otherwise shadow the published binary. The inline registry flag keeps the hook working for teammates who have not edited `~/.npmrc`.
 
 2. Make it executable and enable the hooks directory:
 
@@ -55,19 +74,19 @@ Now every commit message will be validated automatically.
 
 ```bash
 # Validate last commit
-npx -y conventional-commit-msg --last
+conventional-commit-msg --last
 
 # CI mode: validate PR commits
-npx -y conventional-commit-msg --from origin/main --to HEAD
+conventional-commit-msg --from origin/main --to HEAD
 
 # Read commit message from stdin
-echo "feat: add feature" | npx -y conventional-commit-msg
+echo "feat: add feature" | conventional-commit-msg
 
 # Validate commit message file
-npx -y conventional-commit-msg .git/COMMIT_EDITMSG
+conventional-commit-msg .git/COMMIT_EDITMSG
 
 # Verbose mode: show output even on success
-npx -y conventional-commit-msg --last --verbose
+conventional-commit-msg --last --verbose
 ```
 
 ## Options
@@ -86,14 +105,14 @@ npx -y conventional-commit-msg --last --verbose
 
 ```bash
 # Check if last commit is valid (for CI scripts)
-npx -y conventional-commit-msg --last && echo "Valid" || echo "Invalid"
+conventional-commit-msg --last && echo "Valid" || echo "Invalid"
 
 # Validate message from a file (silent on success, shows errors)
-cat .git/COMMIT_EDITMSG | npx -y conventional-commit-msg
+cat .git/COMMIT_EDITMSG | conventional-commit-msg
 
 # Validate multiple messages from a file (one per line)
 while IFS= read -r msg; do
-  echo "$msg" | npx -y conventional-commit-msg || echo "Invalid: $msg"
+  echo "$msg" | conventional-commit-msg || echo "Invalid: $msg"
 done < messages.txt
 ```
 
