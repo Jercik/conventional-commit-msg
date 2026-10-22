@@ -104,8 +104,8 @@ conventional-commit-msg --last --verbose
 ## Pipeline Examples
 
 ```bash
-# Check if last commit is valid (for CI scripts)
-conventional-commit-msg --last && echo "Valid" || echo "Invalid"
+# Check if last commit is valid, exit 1 if not (for CI scripts)
+conventional-commit-msg --last && echo "Valid" || { echo "Invalid"; exit 1; }
 
 # Validate message from a file (silent on success, shows errors)
 cat .git/COMMIT_EDITMSG | conventional-commit-msg
