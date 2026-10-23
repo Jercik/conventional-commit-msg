@@ -8,9 +8,9 @@ Validates commit messages against the [Conventional Commits](https://www.convent
 
 ## Installation
 
-The package is published only as `@j4k-oss/conventional-commit-msg` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `conventional-commit-msg` on npmjs.org is frozen at its last version and gets no updates.
+The package is published only as `@j4k-oss/conventional-commit-msg` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `conventional-commit-msg` on npmjs.org is deprecated and gets no updates.
 
-The `@j4k-oss` scope also exists on npmjs.org under an owner we have not confirmed, so a bare `@j4k-oss/...` command could fetch someone else's package. Map the scope to `code.j4k.dev` once in `~/.npmrc`:
+Without a registry mapping, a bare `@j4k-oss/...` command looks on npmjs.org, finds nothing, and fails with a 404. Map the scope to `code.j4k.dev` once in `~/.npmrc`:
 
 ```ini
 @j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/
