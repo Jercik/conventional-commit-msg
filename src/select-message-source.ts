@@ -1,8 +1,6 @@
 import type { MessageSource } from "./run-commitlint.js";
 
-type MessageSourceSelection = Exclude<MessageSource, { kind: "message" }> | { kind: "stdin" };
-
-type SelectionResult = { ok: true; value: MessageSourceSelection } | { ok: false; error: string };
+type SelectionResult = { ok: true; value: MessageSource } | { ok: false; error: string };
 
 interface SourceOptions {
   last: true | undefined;

@@ -2,8 +2,9 @@ import { execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { Readable } from "node:stream";
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { runCommitlint } from "./run-commitlint.js";
 
@@ -15,6 +16,7 @@ describe("runCommitlint", () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     await rm(temporaryDirectory, { recursive: true, force: true });
   });
 
@@ -123,6 +125,19 @@ describe("runCommitlint", () => {
     const exitCode = await runCommitlint({ source: { kind: "file", path: messageFile } });
 
     expect(exitCode).toBe(0);
+  });
+
+  it.each([
+    { message: "feat: add new feature\n", expected: 0 },
+    { message: "  feat: add new feature\n", expected: 1 },
+  ])("lints piped message $message as given", async ({ message, expected }) => {
+    vi.spyOn(process, "stdin", "get").mockReturnValue(
+      Readable.from([message]) as typeof process.stdin,
+    );
+
+    const exitCode = await runCommitlint({ source: { kind: "stdin" } });
+
+    expect(exitCode).toBe(expected);
   });
 
   it("validates using --last flag", async () => {

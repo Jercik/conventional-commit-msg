@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { text } from "node:stream/consumers";
 import { fileURLToPath } from "node:url";
 
 import format from "@commitlint/format";
@@ -19,7 +20,7 @@ export type MessageSource =
   | { kind: "file"; path: string }
   | { kind: "last" }
   | { kind: "range"; from: string; to: string | undefined }
-  | { kind: "message"; text: string };
+  | { kind: "stdin" };
 
 interface CommitlintOptions {
   source: MessageSource;
@@ -95,8 +96,8 @@ async function readMessages(source: MessageSource): Promise<string[]> {
     case "range": {
       return read({ from: source.from, to: source.to });
     }
-    case "message": {
-      return [source.text];
+    case "stdin": {
+      return [await text(process.stdin)];
     }
     default: {
       return source satisfies never;

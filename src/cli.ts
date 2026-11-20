@@ -7,16 +7,7 @@ import { Command } from "@commander-js/extra-typings";
 import packageJson from "../package.json" with { type: "json" };
 
 import { runCommitlint } from "./run-commitlint.js";
-import type { MessageSource } from "./run-commitlint.js";
 import { selectMessageSource } from "./select-message-source.js";
-
-async function readStdin(): Promise<string> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) {
-    chunks.push(chunk as Buffer);
-  }
-  return Buffer.concat(chunks).toString().trim();
-}
 
 const program = new Command()
   .name(packageJson.name)
@@ -60,18 +51,7 @@ Examples:
       return;
     }
 
-    let source: MessageSource;
-    if (selection.value.kind === "stdin") {
-      const text = await readStdin();
-      if (text === "") {
-        program.error("No commit message provided via stdin.");
-      }
-      source = { kind: "message", text };
-    } else {
-      source = selection.value;
-    }
-
-    const exitCode = await runCommitlint({ source, verbose: options.verbose });
+    const exitCode = await runCommitlint({ source: selection.value, verbose: options.verbose });
 
     process.exit(exitCode);
   });
