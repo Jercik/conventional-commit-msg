@@ -79,10 +79,10 @@ conventional-commit-msg --last
 # CI mode: validate PR commits
 conventional-commit-msg --from origin/main --to HEAD
 
-# Read commit message from stdin
+# Read commit message from stdin; it is linted as given
 echo "feat: add feature" | conventional-commit-msg
 
-# Validate commit message file
+# Validate commit message file, ignoring git's comment lines and the `git commit -v` diff
 conventional-commit-msg .git/COMMIT_EDITMSG
 
 # Verbose mode: show output even on success
@@ -106,9 +106,6 @@ conventional-commit-msg --last --verbose
 ```bash
 # Check if last commit is valid, exit 1 if not (for CI scripts)
 conventional-commit-msg --last && echo "Valid" || { echo "Invalid"; exit 1; }
-
-# Validate message from a file (silent on success, shows errors)
-cat .git/COMMIT_EDITMSG | conventional-commit-msg
 
 # Validate multiple messages from a file (one per line)
 while IFS= read -r msg; do

@@ -50,7 +50,7 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
       to: options.to,
     });
 
-    // A commit-msg hook receives the message before git's cleanup, so lint only what git will keep.
+    // A commit-msg hook receives the message before git's cleanup and cannot see `--cleanup`, so apply git's default `strip` mode.
     const commentString = options.edit === undefined ? undefined : readGitCommentString();
     filteredMessages = messages
       .filter((message): message is string => typeof message === "string")
