@@ -36,6 +36,14 @@ describe("runCommitlint", () => {
     expect(exitCode).not.toBe(0);
   });
 
+  it("returns 2 when the message file is missing", async () => {
+    const exitCode = await runCommitlint({
+      edit: path.join(temporaryDirectory, "COMMIT_EDITMSG"),
+    });
+
+    expect(exitCode).toBe(2);
+  });
+
   it("ignores the comment lines of a squash template", async () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(

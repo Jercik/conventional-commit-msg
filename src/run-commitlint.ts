@@ -34,9 +34,20 @@ interface LintReport {
 
 /**
  * Validates commit messages using commitlint with config-conventional.
- * Returns exit code: 0 for success, 1 for validation errors.
+ * Returns exit code: 0 for success, 1 for validation errors, 2 when the check cannot run.
  */
 export async function runCommitlint(options: CommitlintOptions): Promise<number> {
+  try {
+    return await lintCommitMessages(options);
+  } catch (error) {
+    console.error(
+      `conventional-commit-msg: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return 2;
+  }
+}
+
+async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
   const loaded = await load({ extends: [configConventionalPath] });
 
   // Use stdin message if provided, otherwise read from other sources
