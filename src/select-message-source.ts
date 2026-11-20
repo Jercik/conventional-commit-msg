@@ -13,6 +13,16 @@ export function selectMessageSource(
   options: SourceOptions,
   stdinIsTerminal: boolean,
 ): SelectionResult {
+  if (file === "") {
+    return { ok: false, error: "The message file path is empty." };
+  }
+  if (options.from === "") {
+    return { ok: false, error: "--from needs a commit, not an empty value." };
+  }
+  if (options.to === "") {
+    return { ok: false, error: "--to needs a commit, not an empty value." };
+  }
+
   const chosen: string[] = [];
   if (file !== undefined) {
     chosen.push("a message file");

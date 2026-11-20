@@ -72,6 +72,24 @@ describe("selectMessageSource", () => {
       options: { ...noOptions, last: true as const, to: "HEAD" },
       error: "--to ends a range and needs --from to start it.",
     },
+    {
+      name: "an empty message file path",
+      file: "",
+      options: noOptions,
+      error: "The message file path is empty.",
+    },
+    {
+      name: "an empty --from",
+      file: undefined,
+      options: { ...noOptions, from: "" },
+      error: "--from needs a commit, not an empty value.",
+    },
+    {
+      name: "an empty --to",
+      file: undefined,
+      options: { ...noOptions, from: "origin/main", to: "" },
+      error: "--to needs a commit, not an empty value.",
+    },
   ])("rejects $name", ({ file, options, error }) => {
     expect(selectMessageSource(file, options, false)).toStrictEqual({ ok: false, error });
   });
