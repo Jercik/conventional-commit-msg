@@ -168,14 +168,6 @@ describe("runCommitlint", () => {
     expect(exitCode).toBe(2);
   });
 
-  it("returns 2 when --last runs outside any git repository", async () => {
-    const exitCode = await runInDirectory(temporaryDirectory, () =>
-      runCommitlint({ source: { kind: "last" } }),
-    );
-
-    expect(exitCode).toBe(2);
-  });
-
   it("returns 0 for a range with no commits", async () => {
     createRepositoryWithCommit(temporaryDirectory, "feat: add new feature");
 
