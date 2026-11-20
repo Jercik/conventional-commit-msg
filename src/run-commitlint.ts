@@ -34,7 +34,6 @@ interface LintReport {
 
 /**
  * Validates commit messages using commitlint with config-conventional.
- * Returns exit code: 0 for success, 1 for validation errors, 2 when the check cannot run.
  */
 export async function runCommitlint(options: CommitlintOptions): Promise<number> {
   try {

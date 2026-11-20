@@ -27,13 +27,13 @@ describe("runCommitlint", () => {
     expect(exitCode).toBe(0);
   });
 
-  it("returns non-zero for invalid commit message", async () => {
+  it("returns 1 for invalid commit message", async () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(messageFile, "invalid commit message\n");
 
     const exitCode = await runCommitlint({ edit: messageFile });
 
-    expect(exitCode).not.toBe(0);
+    expect(exitCode).toBe(1);
   });
 
   it("returns 2 when the message file is missing", async () => {

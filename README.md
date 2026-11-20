@@ -103,11 +103,11 @@ conventional-commit-msg --last --verbose
 
 ## Exit Status
 
-| Status | Meaning                                                                   |
-| ------ | ------------------------------------------------------------------------- |
-| `0`    | Every message is valid                                                    |
-| `1`    | A message is invalid, or the arguments are                                |
-| `2`    | The check could not run, such as for a missing file or a failed `git` run |
+| Status | Meaning                                                                          |
+| ------ | -------------------------------------------------------------------------------- |
+| `0`    | Every message is valid                                                           |
+| `1`    | A message is invalid, there is no message to check, or the arguments are invalid |
+| `2`    | The check could not run, such as for a missing file or a failed `git` run        |
 
 ## Pipeline Examples
 
