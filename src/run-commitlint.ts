@@ -54,7 +54,8 @@ async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
   const messages = await readMessages(options.source);
   const filteredMessages = messages.filter((message) => message.trim() !== "");
 
-  if (filteredMessages.length === 0) {
+  // A range can hold no commits, as on a branch with nothing beyond its base, and then nothing in it breaks the convention.
+  if (filteredMessages.length === 0 && options.source.kind !== "range") {
     console.error("No commit messages found to validate");
     return 1;
   }

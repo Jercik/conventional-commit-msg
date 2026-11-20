@@ -105,11 +105,11 @@ Give one message source: a file, `--last`, or `--from` with an optional `--to`. 
 
 ## Exit Status
 
-| Status | Meaning                                                                          |
-| ------ | -------------------------------------------------------------------------------- |
-| `0`    | Every message is valid                                                           |
-| `1`    | A message is invalid, there is no message to check, or the arguments are invalid |
-| `2`    | The check could not run, such as for a missing file or a failed `git` run        |
+| Status | Meaning                                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------------------- |
+| `0`    | Every message is valid, or the commit range holds no commits                                            |
+| `1`    | A message is invalid, the message from a file, stdin or `--last` is empty, or the arguments are invalid |
+| `2`    | The check could not run, such as for a missing file or a failed `git` run                               |
 
 ## Pipeline Examples
 

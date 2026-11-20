@@ -140,24 +140,16 @@ describe("runCommitlint", () => {
     expect(exitCode).toBe(expected);
   });
 
+  it("returns 1 when piped stdin is empty", async () => {
+    vi.spyOn(process, "stdin", "get").mockReturnValue(Readable.from([""]) as typeof process.stdin);
+
+    const exitCode = await runCommitlint({ source: { kind: "stdin" } });
+
+    expect(exitCode).toBe(1);
+  });
+
   it("validates using --last flag", async () => {
-    // The pre-commit hook runs tests in a snapshot repository whose only commit is not conventional, so build the repository this test reads.
-    const git = (...args: string[]) =>
-      execFileSync(
-        "git",
-        [
-          "-c",
-          "commit.gpgsign=false",
-          "-c",
-          "user.name=Test",
-          "-c",
-          "user.email=test@example.com",
-          ...args,
-        ],
-        { cwd: temporaryDirectory, env: environmentWithoutGit(), stdio: "ignore" },
-      );
-    git("init");
-    git("commit", "--allow-empty", "-m", "feat: add new feature");
+    createRepositoryWithCommit(temporaryDirectory, "feat: add new feature");
 
     const exitCode = await runInDirectory(temporaryDirectory, () =>
       runCommitlint({ source: { kind: "last" } }),
@@ -165,7 +157,37 @@ describe("runCommitlint", () => {
 
     expect(exitCode).toBe(0);
   });
+
+  it("returns 0 for a range with no commits", async () => {
+    createRepositoryWithCommit(temporaryDirectory, "feat: add new feature");
+
+    const exitCode = await runInDirectory(temporaryDirectory, () =>
+      runCommitlint({ source: { kind: "range", from: "HEAD", to: "HEAD" } }),
+    );
+
+    expect(exitCode).toBe(0);
+  });
 });
+
+// The pre-commit hook runs tests in a snapshot repository whose only commit is not conventional, so tests that read commits build their own repository.
+function createRepositoryWithCommit(directory: string, message: string): void {
+  const git = (...args: string[]) =>
+    execFileSync(
+      "git",
+      [
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.com",
+        ...args,
+      ],
+      { cwd: directory, env: environmentWithoutGit(), stdio: "ignore" },
+    );
+  git("init");
+  git("commit", "--allow-empty", "-m", message);
+}
 
 function environmentWithoutGit(): NodeJS.ProcessEnv {
   return Object.fromEntries(
