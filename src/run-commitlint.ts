@@ -92,7 +92,7 @@ async function readMessages(source: MessageSource): Promise<string[]> {
       return [cleanUpCommitMessage(await readFile(source.path, "utf8"), readGitCommentString())];
     }
     case "last": {
-      return read({ last: true });
+      return [readLastCommitMessage()];
     }
     case "range": {
       return read({ from: source.from, to: source.to });
@@ -104,6 +104,18 @@ async function readMessages(source: MessageSource): Promise<string[]> {
       return source satisfies never;
     }
   }
+}
+
+// @commitlint/read ignores the exit status of `git log`, so a failed run, such as on a branch with no commits, would look like an empty message.
+function readLastCommitMessage(): string {
+  const result = spawnSync("git", ["log", "-1", "--format=%B"], { encoding: "utf8" });
+  if (result.error !== undefined) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    throw new Error(`git log failed: ${result.stderr.trim()}`);
+  }
+  return result.stdout;
 }
 
 function readGitCommentString(): string {
