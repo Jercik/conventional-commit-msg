@@ -68,6 +68,20 @@ describe("runCommitlint", () => {
     expect(exitCode).toBe(0);
   });
 
+  it("ignores a commitlint config in the current directory", async () => {
+    await writeFile(
+      path.join(temporaryDirectory, ".commitlintrc.json"),
+      JSON.stringify({ rules: { "type-enum": [0], "type-empty": [0], "subject-empty": [0] } }),
+    );
+    await writeFile(path.join(temporaryDirectory, "COMMIT_EDITMSG"), "invalid commit message\n");
+
+    const exitCode = await runInDirectory(temporaryDirectory, () =>
+      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+    );
+
+    expect(exitCode).toBe(1);
+  });
+
   it("ignores the comment lines of a squash template", async () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(

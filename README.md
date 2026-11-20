@@ -4,7 +4,7 @@ Source: https://code.j4k.dev/j4k-oss/conventional-commit-msg. github.com/Jercik/
 
 Zero-config commitlint frontend for conventional commits.
 
-Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) specification using [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional).
+Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) specification using [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional). It ignores any commitlint configuration in the project, its parent directories or your home directory.
 
 ## Installation
 

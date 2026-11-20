@@ -10,9 +10,7 @@ import type { LintOptions, LintOutcome } from "@commitlint/types";
 
 import { cleanUpCommitMessage } from "./clean-up-commit-message.js";
 
-// Resolve config path absolutely to work regardless of cwd.
-// This is necessary because @commitlint/load resolves extends relative to cwd,
-// but when running via npx from a different directory, the config won't be found.
+// Loading this file by path keeps commitlint from searching cwd, its ancestors and the global config directory for a config to merge in.
 const configConventionalPath = fileURLToPath(
   import.meta.resolve("@commitlint/config-conventional"),
 );
@@ -48,7 +46,7 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
 }
 
 async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
-  const loaded = await load({ extends: [configConventionalPath] });
+  const loaded = await load({}, { file: configConventionalPath });
 
   let filteredMessages: string[];
 
