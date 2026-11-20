@@ -36,6 +36,49 @@ describe("runCommitlint", () => {
     expect(exitCode).not.toBe(0);
   });
 
+  it("ignores the comment lines of a squash template", async () => {
+    const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
+    await writeFile(
+      messageFile,
+      [
+        "# This is a combination of 2 commits.",
+        "# This is the 1st commit message:",
+        "",
+        "feat: add login form",
+        "",
+        "# This is the commit message #2:",
+        "",
+        "fix: correct label typo",
+        "",
+      ].join("\n"),
+    );
+
+    const exitCode = await runCommitlint({ edit: messageFile });
+
+    expect(exitCode).toBe(0);
+  });
+
+  it("ignores everything below the scissors line of a verbose commit", async () => {
+    const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
+    await writeFile(
+      messageFile,
+      [
+        "feat: add login form",
+        "",
+        "# ------------------------ >8 ------------------------",
+        "# Do not modify or remove the line above.",
+        "# Everything below it will be ignored.",
+        "diff --git a/login.html b/login.html",
+        '+<form class="login-form login-form--wide login-form--bordered" method="post" action="/session/new" autocomplete="on">',
+        "",
+      ].join("\n"),
+    );
+
+    const exitCode = await runCommitlint({ edit: messageFile });
+
+    expect(exitCode).toBe(0);
+  });
+
   it("validates using --last flag", async () => {
     // The pre-commit hook runs tests in a snapshot repository whose only commit is not conventional, so build the repository this test reads.
     const environment = Object.fromEntries(

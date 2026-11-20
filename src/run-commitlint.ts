@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import format from "@commitlint/format";
@@ -5,6 +6,8 @@ import lint from "@commitlint/lint";
 import load from "@commitlint/load";
 import read from "@commitlint/read";
 import type { LintOptions, LintOutcome } from "@commitlint/types";
+
+import { cleanUpCommitMessage } from "./clean-up-commit-message.js";
 
 // Resolve config path absolutely to work regardless of cwd.
 // This is necessary because @commitlint/load resolves extends relative to cwd,
@@ -47,9 +50,14 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
       to: options.to,
     });
 
-    filteredMessages = messages.filter(
-      (message): message is string => typeof message === "string" && message.trim() !== "",
-    );
+    // A commit-msg hook receives the message before git's cleanup, so lint only what git will keep.
+    const commentString = options.edit === undefined ? undefined : readGitCommentString();
+    filteredMessages = messages
+      .filter((message): message is string => typeof message === "string")
+      .map((message) =>
+        commentString === undefined ? message : cleanUpCommitMessage(message, commentString),
+      )
+      .filter((message) => message.trim() !== "");
   } else {
     filteredMessages = [options.stdinMessage];
   }
@@ -82,6 +90,32 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
   }
 
   return report.valid ? 0 : 1;
+}
+
+function readGitCommentString(): string {
+  const result = spawnSync(
+    "git",
+    ["config", "--null", "--get-regexp", String.raw`^core\.comment(char|string)$`],
+    { encoding: "utf8" },
+  );
+  if (result.error !== undefined) {
+    throw result.error;
+  }
+  if (result.status === 1) {
+    return "#";
+  }
+  if (result.status !== 0) {
+    throw new Error(`git config failed: ${result.stderr.trim()}`);
+  }
+  // core.commentChar and core.commentString name one setting, and the last entry wins.
+  const lastEntry = result.stdout.split("\0").findLast((entry) => entry !== "") ?? "";
+  const value = lastEntry.slice(lastEntry.indexOf("\n") + 1);
+  if (value === "auto") {
+    throw new Error(
+      "core.commentChar=auto is not supported: set core.commentChar to the character git uses for comments",
+    );
+  }
+  return value;
 }
 
 function buildReport(results: LintOutcome[]): LintReport {
