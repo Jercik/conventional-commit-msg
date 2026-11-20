@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -22,7 +22,7 @@ describe("runCommitlint", () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(messageFile, "feat: add new feature\n");
 
-    const exitCode = await runCommitlint({ edit: messageFile });
+    const exitCode = await runCommitlint({ messageFile });
 
     expect(exitCode).toBe(0);
   });
@@ -31,17 +31,41 @@ describe("runCommitlint", () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(messageFile, "invalid commit message\n");
 
-    const exitCode = await runCommitlint({ edit: messageFile });
+    const exitCode = await runCommitlint({ messageFile });
 
     expect(exitCode).toBe(1);
   });
 
   it("returns 2 when the message file is missing", async () => {
     const exitCode = await runCommitlint({
-      edit: path.join(temporaryDirectory, "COMMIT_EDITMSG"),
+      messageFile: path.join(temporaryDirectory, "COMMIT_EDITMSG"),
     });
 
     expect(exitCode).toBe(2);
+  });
+
+  it("reads a relative message file from the current directory, not the repository root", async () => {
+    execFileSync("git", ["init", "-q"], { cwd: temporaryDirectory, env: environmentWithoutGit() });
+    await writeFile(path.join(temporaryDirectory, "COMMIT_EDITMSG"), "invalid commit message\n");
+    const subdirectory = path.join(temporaryDirectory, "packages", "app");
+    await mkdir(subdirectory, { recursive: true });
+    await writeFile(path.join(subdirectory, "COMMIT_EDITMSG"), "feat: add new feature\n");
+
+    const exitCode = await runInDirectory(subdirectory, () =>
+      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+    );
+
+    expect(exitCode).toBe(0);
+  });
+
+  it("reads a message file outside any git repository", async () => {
+    await writeFile(path.join(temporaryDirectory, "COMMIT_EDITMSG"), "feat: add new feature\n");
+
+    const exitCode = await runInDirectory(temporaryDirectory, () =>
+      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+    );
+
+    expect(exitCode).toBe(0);
   });
 
   it("ignores the comment lines of a squash template", async () => {
@@ -61,7 +85,7 @@ describe("runCommitlint", () => {
       ].join("\n"),
     );
 
-    const exitCode = await runCommitlint({ edit: messageFile });
+    const exitCode = await runCommitlint({ messageFile });
 
     expect(exitCode).toBe(0);
   });
@@ -82,16 +106,13 @@ describe("runCommitlint", () => {
       ].join("\n"),
     );
 
-    const exitCode = await runCommitlint({ edit: messageFile });
+    const exitCode = await runCommitlint({ messageFile });
 
     expect(exitCode).toBe(0);
   });
 
   it("validates using --last flag", async () => {
     // The pre-commit hook runs tests in a snapshot repository whose only commit is not conventional, so build the repository this test reads.
-    const environment = Object.fromEntries(
-      Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
-    );
     const git = (...args: string[]) =>
       execFileSync(
         "git",
@@ -104,19 +125,29 @@ describe("runCommitlint", () => {
           "user.email=test@example.com",
           ...args,
         ],
-        { cwd: temporaryDirectory, env: environment, stdio: "ignore" },
+        { cwd: temporaryDirectory, env: environmentWithoutGit(), stdio: "ignore" },
       );
     git("init");
     git("commit", "--allow-empty", "-m", "feat: add new feature");
 
-    const originalDirectory = process.cwd();
-    process.chdir(temporaryDirectory);
-    try {
-      const exitCode = await runCommitlint({ last: true });
+    const exitCode = await runInDirectory(temporaryDirectory, () => runCommitlint({ last: true }));
 
-      expect(exitCode).toBe(0);
-    } finally {
-      process.chdir(originalDirectory);
-    }
+    expect(exitCode).toBe(0);
   });
 });
+
+function environmentWithoutGit(): NodeJS.ProcessEnv {
+  return Object.fromEntries(
+    Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
+  );
+}
+
+async function runInDirectory<T>(directory: string, run: () => Promise<T>): Promise<T> {
+  const originalDirectory = process.cwd();
+  process.chdir(directory);
+  try {
+    return await run();
+  } finally {
+    process.chdir(originalDirectory);
+  }
+}

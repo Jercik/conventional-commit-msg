@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import format from "@commitlint/format";
@@ -17,7 +18,7 @@ const configConventionalPath = fileURLToPath(
 );
 
 interface CommitlintOptions {
-  edit?: string | undefined;
+  messageFile?: string | undefined;
   last?: boolean | undefined;
   from?: string | undefined;
   to?: string | undefined;
@@ -49,27 +50,20 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
 async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
   const loaded = await load({ extends: [configConventionalPath] });
 
-  // Use stdin message if provided, otherwise read from other sources
   let filteredMessages: string[];
 
-  if (options.stdinMessage === undefined) {
-    const messages = await read({
-      edit: options.edit,
-      last: options.last,
-      from: options.from,
-      to: options.to,
-    });
-
-    // A commit-msg hook receives the message before git's cleanup and cannot see `--cleanup`, so apply git's default `strip` mode.
-    const commentString = options.edit === undefined ? undefined : readGitCommentString();
-    filteredMessages = messages
-      .filter((message): message is string => typeof message === "string")
-      .map((message) =>
-        commentString === undefined ? message : cleanUpCommitMessage(message, commentString),
-      )
-      .filter((message) => message.trim() !== "");
-  } else {
+  if (options.stdinMessage !== undefined) {
     filteredMessages = [options.stdinMessage];
+  } else if (options.messageFile === undefined) {
+    const messages = await read({ last: options.last, from: options.from, to: options.to });
+    filteredMessages = messages.filter((message) => message.trim() !== "");
+  } else {
+    // A commit-msg hook receives the message before git's cleanup and cannot see `--cleanup`, so apply git's default `strip` mode.
+    const message = cleanUpCommitMessage(
+      await readFile(options.messageFile, "utf8"),
+      readGitCommentString(),
+    );
+    filteredMessages = message.trim() === "" ? [] : [message];
   }
 
   if (filteredMessages.length === 0) {

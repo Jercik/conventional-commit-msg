@@ -66,7 +66,7 @@ Examples:
     }
 
     const exitCode = await runCommitlint({
-      edit: file,
+      messageFile: file,
       last: options.last,
       from: options.from,
       to: options.to,
