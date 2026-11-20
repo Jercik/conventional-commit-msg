@@ -15,12 +15,14 @@ const configConventionalPath = fileURLToPath(
   import.meta.resolve("@commitlint/config-conventional"),
 );
 
+export type MessageSource =
+  | { kind: "file"; path: string }
+  | { kind: "last" }
+  | { kind: "range"; from: string; to: string | undefined }
+  | { kind: "message"; text: string };
+
 interface CommitlintOptions {
-  messageFile?: string | undefined;
-  last?: boolean | undefined;
-  from?: string | undefined;
-  to?: string | undefined;
-  stdinMessage?: string | undefined;
+  source: MessageSource;
   verbose?: boolean | undefined;
 }
 
@@ -48,21 +50,8 @@ export async function runCommitlint(options: CommitlintOptions): Promise<number>
 async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
   const loaded = await load({}, { file: configConventionalPath });
 
-  let filteredMessages: string[];
-
-  if (options.stdinMessage !== undefined) {
-    filteredMessages = [options.stdinMessage];
-  } else if (options.messageFile === undefined) {
-    const messages = await read({ last: options.last, from: options.from, to: options.to });
-    filteredMessages = messages.filter((message) => message.trim() !== "");
-  } else {
-    // A commit-msg hook receives the message before git's cleanup and cannot see `--cleanup`, so apply git's default `strip` mode.
-    const message = cleanUpCommitMessage(
-      await readFile(options.messageFile, "utf8"),
-      readGitCommentString(),
-    );
-    filteredMessages = message.trim() === "" ? [] : [message];
-  }
+  const messages = await readMessages(options.source);
+  const filteredMessages = messages.filter((message) => message.trim() !== "");
 
   if (filteredMessages.length === 0) {
     console.error("No commit messages found to validate");
@@ -92,6 +81,27 @@ async function lintCommitMessages(options: CommitlintOptions): Promise<number> {
   }
 
   return report.valid ? 0 : 1;
+}
+
+async function readMessages(source: MessageSource): Promise<string[]> {
+  switch (source.kind) {
+    case "file": {
+      // A commit-msg hook receives the message before git's cleanup and cannot see `--cleanup`, so apply git's default `strip` mode.
+      return [cleanUpCommitMessage(await readFile(source.path, "utf8"), readGitCommentString())];
+    }
+    case "last": {
+      return read({ last: true });
+    }
+    case "range": {
+      return read({ from: source.from, to: source.to });
+    }
+    case "message": {
+      return [source.text];
+    }
+    default: {
+      return source satisfies never;
+    }
+  }
 }
 
 function readGitCommentString(): string {

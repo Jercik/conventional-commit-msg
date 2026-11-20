@@ -22,7 +22,7 @@ describe("runCommitlint", () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(messageFile, "feat: add new feature\n");
 
-    const exitCode = await runCommitlint({ messageFile });
+    const exitCode = await runCommitlint({ source: { kind: "file", path: messageFile } });
 
     expect(exitCode).toBe(0);
   });
@@ -31,14 +31,14 @@ describe("runCommitlint", () => {
     const messageFile = path.join(temporaryDirectory, "COMMIT_EDITMSG");
     await writeFile(messageFile, "invalid commit message\n");
 
-    const exitCode = await runCommitlint({ messageFile });
+    const exitCode = await runCommitlint({ source: { kind: "file", path: messageFile } });
 
     expect(exitCode).toBe(1);
   });
 
   it("returns 2 when the message file is missing", async () => {
     const exitCode = await runCommitlint({
-      messageFile: path.join(temporaryDirectory, "COMMIT_EDITMSG"),
+      source: { kind: "file", path: path.join(temporaryDirectory, "COMMIT_EDITMSG") },
     });
 
     expect(exitCode).toBe(2);
@@ -52,7 +52,7 @@ describe("runCommitlint", () => {
     await writeFile(path.join(subdirectory, "COMMIT_EDITMSG"), "feat: add new feature\n");
 
     const exitCode = await runInDirectory(subdirectory, () =>
-      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+      runCommitlint({ source: { kind: "file", path: "COMMIT_EDITMSG" } }),
     );
 
     expect(exitCode).toBe(0);
@@ -62,7 +62,7 @@ describe("runCommitlint", () => {
     await writeFile(path.join(temporaryDirectory, "COMMIT_EDITMSG"), "feat: add new feature\n");
 
     const exitCode = await runInDirectory(temporaryDirectory, () =>
-      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+      runCommitlint({ source: { kind: "file", path: "COMMIT_EDITMSG" } }),
     );
 
     expect(exitCode).toBe(0);
@@ -76,7 +76,7 @@ describe("runCommitlint", () => {
     await writeFile(path.join(temporaryDirectory, "COMMIT_EDITMSG"), "invalid commit message\n");
 
     const exitCode = await runInDirectory(temporaryDirectory, () =>
-      runCommitlint({ messageFile: "COMMIT_EDITMSG" }),
+      runCommitlint({ source: { kind: "file", path: "COMMIT_EDITMSG" } }),
     );
 
     expect(exitCode).toBe(1);
@@ -99,7 +99,7 @@ describe("runCommitlint", () => {
       ].join("\n"),
     );
 
-    const exitCode = await runCommitlint({ messageFile });
+    const exitCode = await runCommitlint({ source: { kind: "file", path: messageFile } });
 
     expect(exitCode).toBe(0);
   });
@@ -120,7 +120,7 @@ describe("runCommitlint", () => {
       ].join("\n"),
     );
 
-    const exitCode = await runCommitlint({ messageFile });
+    const exitCode = await runCommitlint({ source: { kind: "file", path: messageFile } });
 
     expect(exitCode).toBe(0);
   });
@@ -144,7 +144,9 @@ describe("runCommitlint", () => {
     git("init");
     git("commit", "--allow-empty", "-m", "feat: add new feature");
 
-    const exitCode = await runInDirectory(temporaryDirectory, () => runCommitlint({ last: true }));
+    const exitCode = await runInDirectory(temporaryDirectory, () =>
+      runCommitlint({ source: { kind: "last" } }),
+    );
 
     expect(exitCode).toBe(0);
   });

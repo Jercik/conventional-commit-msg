@@ -7,6 +7,8 @@ import { Command } from "@commander-js/extra-typings";
 import packageJson from "../package.json" with { type: "json" };
 
 import { runCommitlint } from "./run-commitlint.js";
+import type { MessageSource } from "./run-commitlint.js";
+import { selectMessageSource } from "./select-message-source.js";
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
@@ -48,31 +50,28 @@ Examples:
 `,
   )
   .action(async (file, options) => {
-    const hasPipedInput = !process.stdin.isTTY;
-    const hasValidationTarget =
-      file !== undefined || options.last === true || options.from !== undefined || hasPipedInput;
-
-    if (!hasValidationTarget) {
-      program.error("Missing validation target. Provide a file, --last, --from, or pipe input.");
+    const selection = selectMessageSource(
+      file,
+      { last: options.last, from: options.from, to: options.to },
+      process.stdin.isTTY,
+    );
+    if (!selection.ok) {
+      program.error(selection.error);
+      return;
     }
 
-    // Read from stdin if piped and no other input source
-    let stdinMessage: string | undefined;
-    if (hasPipedInput && file === undefined && !options.last && !options.from) {
-      stdinMessage = await readStdin();
-      if (stdinMessage === "") {
+    let source: MessageSource;
+    if (selection.value.kind === "stdin") {
+      const text = await readStdin();
+      if (text === "") {
         program.error("No commit message provided via stdin.");
       }
+      source = { kind: "message", text };
+    } else {
+      source = selection.value;
     }
 
-    const exitCode = await runCommitlint({
-      messageFile: file,
-      last: options.last,
-      from: options.from,
-      to: options.to,
-      stdinMessage,
-      verbose: options.verbose,
-    });
+    const exitCode = await runCommitlint({ source, verbose: options.verbose });
 
     process.exit(exitCode);
   });

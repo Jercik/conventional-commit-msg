@@ -101,6 +101,8 @@ conventional-commit-msg --last --verbose
 | `-V, --version` | Output the version number           |
 | `-h, --help`    | Display help for command            |
 
+Give one message source: a file, `--last`, or `--from` with an optional `--to`. With none of them, the message is read from piped stdin. Any other combination is rejected as invalid arguments.
+
 ## Exit Status
 
 | Status | Meaning                                                                          |
